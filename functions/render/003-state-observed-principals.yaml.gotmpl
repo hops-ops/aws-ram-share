@@ -1,0 +1,37 @@
+# code: language=yaml
+#
+# Observed State: Principal Associations
+# ======================================
+# Extract observed state from PrincipalAssociation resources.
+#
+
+{{- $raw := $.observed.resources | default dict }}
+{{- $eff := $state.spec.effective }}
+
+{{- $observedPrincipals := dict }}
+
+{{- range $i, $prin := $eff.principals }}
+  {{- $prinName := $prin.name | default (printf "prin-%d" $i) }}
+  {{- $principalKey := printf "principal-assoc-%s" $prinName }}
+
+  {{- $entry := get $raw $principalKey | default dict }}
+  {{- $resource := $entry.resource | default dict }}
+  {{- $status := $resource.status | default dict }}
+  {{- $atProvider := $status.atProvider | default dict }}
+
+  # Check readiness
+  {{- $ready := false }}
+  {{- range ($status.conditions | default list) }}
+    {{- if and (eq .type "Ready") (eq .status "True") }}
+      {{- $ready = true }}
+    {{- end }}
+  {{- end }}
+
+  {{- $_ := set $observedPrincipals $prinName (dict
+    "ready" $ready
+    "principal" ($atProvider.principal | default "")
+    "resourceShareArn" ($atProvider.resourceShareArn | default "")
+  ) }}
+{{- end }}
+
+{{- $state = set $state "observed" (merge $state.observed (dict "principals" $observedPrincipals)) }}

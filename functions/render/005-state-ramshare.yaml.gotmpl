@@ -1,0 +1,98 @@
+# code: language=yaml
+#
+# Computed State: RAMShare
+# ========================
+# Build the ramshare state slice with computed values for resources.
+#
+
+{{- $eff := $state.spec.effective }}
+{{- $observed := $state.observed }}
+
+# ==============================================================================
+# Core ramshare state
+# ==============================================================================
+{{- $ramshare := dict
+  "xrName" $eff.xrName
+  "name" $eff.name
+  "region" $eff.region
+  "providerConfig" $eff.providerConfigRef
+  "managementPolicies" $eff.managementPolicies
+  "allowExternalPrincipals" $eff.allowExternalPrincipals
+  "permissionArns" $eff.permissionArns
+  "tags" $eff.tags
+  "forProvider" $eff.forProvider
+}}
+
+# ==============================================================================
+# ResourceShare render state
+# ==============================================================================
+{{- $shareReady := $observed.share.ready }}
+{{- $shareArn := $observed.share.arn }}
+
+{{- $share := dict
+  "render" true
+  "ready" $shareReady
+  "arn" $shareArn
+}}
+{{- $ramshare = set $ramshare "share" $share }}
+
+# ==============================================================================
+# Resource associations render state
+# Only render resource associations after ResourceShare is ready
+# ==============================================================================
+{{- $renderResources := $shareReady }}
+{{- $resourcesList := list }}
+
+{{- range $i, $res := $eff.resources }}
+  {{- $resName := $res.name | default (printf "res-%d" $i) }}
+  {{- $observedRes := get $observed.resources $resName | default dict }}
+
+  {{- $resourcesList = append $resourcesList (dict
+    "name" $resName
+    "arn" $res.arn
+    "render" $renderResources
+    "ready" ($observedRes.ready | default false)
+  ) }}
+{{- end }}
+
+{{- $resources := dict
+  "render" $renderResources
+  "items" $resourcesList
+}}
+{{- $ramshare = set $ramshare "resources" $resources }}
+
+# ==============================================================================
+# Principal associations render state
+# Only render principal associations after ResourceShare is ready
+# ==============================================================================
+{{- $renderPrincipals := $shareReady }}
+{{- $principalsList := list }}
+
+{{- range $i, $prin := $eff.principals }}
+  {{- $prinName := $prin.name | default (printf "prin-%d" $i) }}
+  {{- $observedPrin := get $observed.principals $prinName | default dict }}
+
+  # Compute principal value based on type
+  {{- $principalValue := "" }}
+  {{- if eq $prin.type "account" }}
+    {{- $principalValue = $prin.id }}
+  {{- else }}
+    {{- $principalValue = $prin.arn }}
+  {{- end }}
+
+  {{- $principalsList = append $principalsList (dict
+    "name" $prinName
+    "type" $prin.type
+    "principal" $principalValue
+    "render" $renderPrincipals
+    "ready" ($observedPrin.ready | default false)
+  ) }}
+{{- end }}
+
+{{- $principals := dict
+  "render" $renderPrincipals
+  "items" $principalsList
+}}
+{{- $ramshare = set $ramshare "principals" $principals }}
+
+{{- $state = set $state "ramshare" $ramshare }}

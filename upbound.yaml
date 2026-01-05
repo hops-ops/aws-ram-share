@@ -1,0 +1,25 @@
+apiVersion: meta.dev.upbound.io/v2alpha1
+kind: Project
+metadata:
+  name: configuration-aws-ram-share
+spec:
+  dependsOn:
+  - apiVersion: pkg.crossplane.io/v1
+    kind: Function
+    package: xpkg.crossplane.io/crossplane-contrib/function-auto-ready
+    version: '>=v0.6.0'
+  - apiVersion: pkg.crossplane.io/v1
+    kind: Provider
+    package: xpkg.crossplane.io/crossplane-contrib/provider-aws-ram
+    version: '>=v2.1.0'
+  description: XRD for AWS Resource Access Manager (RAM) shares enabling cross-account
+    resource sharing.
+  license: Apache-2.0
+  maintainer: Patrick Lee Scott <pat@patscott.io>
+  readme: |
+    # configuration-aws-ram-share
+
+    Provides a reusable RAM share blueprint for sharing AWS resources across accounts.
+    Supports sharing IPAM pools, Transit Gateways, Subnets, Private CAs, and 60+ other resource types.
+  repository: ghcr.io/hops-ops/configuration-aws-ram-share
+  source: github.com/hops-ops/configuration-aws-ram-share

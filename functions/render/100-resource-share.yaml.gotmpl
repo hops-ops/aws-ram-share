@@ -1,0 +1,36 @@
+# code: language=yaml
+#
+# ResourceShare
+# =============
+# The main RAM resource share that holds associations.
+#
+
+{{- $rs := $state.ramshare }}
+
+{{- if $rs.share.render }}
+---
+apiVersion: ram.aws.m.upbound.io/v1beta1
+kind: ResourceShare
+metadata:
+  name: {{ $rs.xrName }}
+  annotations:
+    {{ setResourceNameAnnotation "resource-share" }}
+  labels:
+    hops.ops.com.ai/ram-share: {{ $rs.xrName }}
+spec:
+  managementPolicies: {{ toJson $rs.managementPolicies }}
+  forProvider:
+    region: {{ $rs.region }}
+    name: {{ $rs.name }}
+    allowExternalPrincipals: {{ $rs.allowExternalPrincipals }}
+    {{- if gt (len $rs.permissionArns) 0 }}
+    permissionArns: {{ toJson $rs.permissionArns }}
+    {{- end }}
+    tags: {{ toJson $rs.tags }}
+    {{- range $k, $v := $rs.forProvider }}
+    {{ $k }}: {{ toJson $v }}
+    {{- end }}
+  providerConfigRef:
+    name: {{ $rs.providerConfig.name }}
+    kind: {{ $rs.providerConfig.kind }}
+{{- end }}

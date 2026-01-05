@@ -1,0 +1,35 @@
+# code: language=yaml
+#
+# Resource Associations
+# =====================
+# Associate resources (by ARN) with the RAM share.
+#
+
+{{- $rs := $state.ramshare }}
+
+{{- if $rs.resources.render }}
+{{- range $res := $rs.resources.items }}
+{{- if $res.render }}
+---
+apiVersion: ram.aws.m.upbound.io/v1beta1
+kind: ResourceAssociation
+metadata:
+  name: {{ $rs.xrName }}-{{ $res.name }}
+  annotations:
+    {{ setResourceNameAnnotation (printf "resource-assoc-%s" $res.name) }}
+  labels:
+    hops.ops.com.ai/ram-share: {{ $rs.xrName }}
+    hops.ops.com.ai/resource-name: {{ $res.name }}
+spec:
+  managementPolicies: {{ toJson $rs.managementPolicies }}
+  forProvider:
+    region: {{ $rs.region }}
+    resourceArn: {{ $res.arn }}
+    resourceShareArnRef:
+      name: {{ $rs.xrName }}
+  providerConfigRef:
+    name: {{ $rs.providerConfig.name }}
+    kind: {{ $rs.providerConfig.kind }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,37 @@
+# code: language=yaml
+#
+# Observed State: Resource Associations
+# =====================================
+# Extract observed state from ResourceAssociation resources.
+#
+
+{{- $raw := $.observed.resources | default dict }}
+{{- $eff := $state.spec.effective }}
+
+{{- $observedResources := dict }}
+
+{{- range $i, $res := $eff.resources }}
+  {{- $resName := $res.name | default (printf "res-%d" $i) }}
+  {{- $resourceKey := printf "resource-assoc-%s" $resName }}
+
+  {{- $entry := get $raw $resourceKey | default dict }}
+  {{- $resource := $entry.resource | default dict }}
+  {{- $status := $resource.status | default dict }}
+  {{- $atProvider := $status.atProvider | default dict }}
+
+  # Check readiness
+  {{- $ready := false }}
+  {{- range ($status.conditions | default list) }}
+    {{- if and (eq .type "Ready") (eq .status "True") }}
+      {{- $ready = true }}
+    {{- end }}
+  {{- end }}
+
+  {{- $_ := set $observedResources $resName (dict
+    "ready" $ready
+    "resourceArn" ($atProvider.resourceArn | default "")
+    "resourceShareArn" ($atProvider.resourceShareArn | default "")
+  ) }}
+{{- end }}
+
+{{- $state = set $state "observed" (merge $state.observed (dict "resources" $observedResources)) }}

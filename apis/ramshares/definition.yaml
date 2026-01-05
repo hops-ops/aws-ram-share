@@ -1,0 +1,170 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: ramshares.aws.hops.ops.com.ai
+spec:
+  scope: Namespaced
+  group: aws.hops.ops.com.ai
+  names:
+    kind: RAMShare
+    plural: ramshares
+  versions:
+  - name: v1alpha1
+    referenceable: true
+    served: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        description: RAMShare manages AWS Resource Access Manager shares for cross-account resource sharing.
+        required:
+        - spec
+        properties:
+          spec:
+            type: object
+            description: Desired state for the RAM share.
+            required:
+            - region
+            - name
+            properties:
+              managementPolicies:
+                type: array
+                description: Management operations permitted on composed resources.
+                items:
+                  type: string
+                  enum:
+                  - "*"
+                  - Create
+                  - Observe
+                  - Update
+                  - Delete
+                  - LateInitialize
+                default:
+                - "*"
+              providerConfigRef:
+                type: object
+                description: Reference to the ProviderConfig for AWS API operations.
+                properties:
+                  kind:
+                    type: string
+                    description: Kind of the provider config.
+                    enum:
+                    - ProviderConfig
+                    - ClusterProviderConfig
+                    default: ProviderConfig
+                  name:
+                    type: string
+                    description: Name of the provider config.
+                    default: default
+                required:
+                - name
+              region:
+                type: string
+                description: AWS region for the RAM share.
+              name:
+                type: string
+                description: Name of the RAM resource share in AWS.
+              allowExternalPrincipals:
+                type: boolean
+                description: |
+                  Whether principals outside the organization can be associated.
+                  Set to false (default) for organization-only sharing.
+                default: false
+              permissionArns:
+                type: array
+                description: |
+                  Custom RAM permission ARNs to associate with the share.
+                  If not specified, AWS uses default permissions for each resource type.
+                items:
+                  type: string
+              resources:
+                type: array
+                description: Resources to share via RAM.
+                items:
+                  type: object
+                  description: A resource to include in the share.
+                  properties:
+                    arn:
+                      type: string
+                      description: ARN of the resource to share.
+                    name:
+                      type: string
+                      description: |
+                        Friendly name for this resource association.
+                        Used to generate the Crossplane resource name.
+                        Defaults to a hash of the ARN if not provided.
+              principals:
+                type: array
+                description: Principals (accounts, OUs, organization) to share with.
+                items:
+                  type: object
+                  description: A principal to share resources with.
+                  required:
+                  - type
+                  properties:
+                    type:
+                      type: string
+                      description: Type of principal.
+                      enum:
+                      - organization
+                      - organizationalUnit
+                      - account
+                    arn:
+                      type: string
+                      description: |
+                        ARN of the principal (organization or OU).
+                        Required for organization and organizationalUnit types.
+                    id:
+                      type: string
+                      description: |
+                        AWS account ID.
+                        Required for account type principals.
+                    name:
+                      type: string
+                      description: |
+                        Friendly name for this principal association.
+                        Used to generate the Crossplane resource name.
+              tags:
+                type: object
+                description: AWS tags to apply to the resource share.
+                x-kubernetes-preserve-unknown-fields: true
+              forProvider:
+                type: object
+                description: Override any forProvider field on the ResourceShare.
+                x-kubernetes-preserve-unknown-fields: true
+          status:
+            type: object
+            description: Observed state of the RAM share.
+            properties:
+              ready:
+                type: boolean
+                description: Whether all resources are ready.
+              shareArn:
+                type: string
+                description: ARN of the RAM resource share.
+              shareId:
+                type: string
+                description: ID of the RAM resource share.
+              resources:
+                type: array
+                description: Status of resource associations.
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    arn:
+                      type: string
+                    ready:
+                      type: boolean
+              principals:
+                type: array
+                description: Status of principal associations.
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    principal:
+                      type: string
+                    ready:
+                      type: boolean

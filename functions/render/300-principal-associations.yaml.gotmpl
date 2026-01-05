@@ -1,0 +1,36 @@
+# code: language=yaml
+#
+# Principal Associations
+# ======================
+# Associate principals (accounts, OUs, org) with the RAM share.
+#
+
+{{- $rs := $state.ramshare }}
+
+{{- if $rs.principals.render }}
+{{- range $prin := $rs.principals.items }}
+{{- if $prin.render }}
+---
+apiVersion: ram.aws.m.upbound.io/v1beta1
+kind: PrincipalAssociation
+metadata:
+  name: {{ $rs.xrName }}-{{ $prin.name }}
+  annotations:
+    {{ setResourceNameAnnotation (printf "principal-assoc-%s" $prin.name) }}
+  labels:
+    hops.ops.com.ai/ram-share: {{ $rs.xrName }}
+    hops.ops.com.ai/principal-name: {{ $prin.name }}
+    hops.ops.com.ai/principal-type: {{ $prin.type }}
+spec:
+  managementPolicies: {{ toJson $rs.managementPolicies }}
+  forProvider:
+    region: {{ $rs.region }}
+    principal: "{{ $prin.principal }}"
+    resourceShareArnRef:
+      name: {{ $rs.xrName }}
+  providerConfigRef:
+    name: {{ $rs.providerConfig.name }}
+    kind: {{ $rs.providerConfig.kind }}
+{{- end }}
+{{- end }}
+{{- end }}

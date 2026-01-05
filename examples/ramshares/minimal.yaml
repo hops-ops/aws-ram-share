@@ -1,0 +1,18 @@
+apiVersion: aws.hops.ops.com.ai/v1alpha1
+kind: RAMShare
+metadata:
+  name: minimal-share
+  namespace: crossplane-system
+spec:
+  region: us-east-1
+  name: minimal-share
+
+  # Share a single resource with a single account
+  resources:
+    - name: my-resource
+      arn: arn:aws:ec2::123456789012:ipam-pool/ipam-pool-0abc123
+
+  principals:
+    - name: target-account
+      type: account
+      id: "999999999999"

@@ -1,0 +1,33 @@
+apiVersion: aws.hops.ops.com.ai/v1alpha1
+kind: RAMShare
+metadata:
+  name: central-transit-gateway
+  namespace: crossplane-system
+spec:
+  providerConfigRef:
+    name: aws-network
+    kind: ProviderConfig
+
+  region: us-east-1
+  name: central-transit-gateway
+
+  # Allow sharing with any account (for multi-org scenarios)
+  allowExternalPrincipals: false
+
+  # Share the Transit Gateway
+  resources:
+    - name: tgw
+      arn: arn:aws:ec2:us-east-1:222222222222:transit-gateway/tgw-0abc123def456789a
+
+  # Share with all workload accounts via OU
+  principals:
+    - name: workloads-ou
+      type: organizationalUnit
+      arn: arn:aws:organizations::111111111111:ou/o-abc123def4/ou-root-workloads
+    - name: shared-services
+      type: account
+      id: "333333333333"
+
+  tags:
+    environment: network
+    purpose: hub-spoke-connectivity

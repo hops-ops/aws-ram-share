@@ -1,0 +1,6 @@
+# Build output
+_output/
+.up/
+
+# E2E test credentials
+tests/e2etest-*/secrets/

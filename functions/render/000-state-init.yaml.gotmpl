@@ -1,0 +1,70 @@
+# code: language=yaml
+#
+# State Initialization
+# ====================
+# Initialize $state with spec.raw and spec.effective (with defaults applied).
+# All subsequent templates use $state.spec.effective.
+#
+
+{{- $xr := getCompositeResource . }}
+{{- $metadata := $xr.metadata | default (dict) }}
+{{- $spec := $xr.spec | default (dict) }}
+
+# ==============================================================================
+# Build spec.effective with defaults
+# ==============================================================================
+{{- $providerConfigRef := $spec.providerConfigRef | default (dict) }}
+
+{{- $effectiveSpec := dict
+  "xrName" $metadata.name
+  "region" $spec.region
+  "name" $spec.name
+  "allowExternalPrincipals" ($spec.allowExternalPrincipals | default false)
+  "permissionArns" ($spec.permissionArns | default list)
+  "managementPolicies" ($spec.managementPolicies | default (list "*"))
+  "forProvider" ($spec.forProvider | default dict)
+  "providerConfigRef" (dict
+    "name" ($providerConfigRef.name | default "default")
+    "kind" ($providerConfigRef.kind | default "ProviderConfig")
+  )
+  "resources" ($spec.resources | default list)
+  "principals" ($spec.principals | default list)
+  "tags" (merge (dict "hops" "true") ($spec.tags | default dict))
+}}
+
+# ==============================================================================
+# Build resource name lookup (name -> index)
+# ==============================================================================
+{{- $resourceNames := dict }}
+{{- range $i, $res := $effectiveSpec.resources }}
+  {{- $resName := $res.name | default (printf "res-%d" $i) }}
+  {{- $_ := set $resourceNames $resName $i }}
+{{- end }}
+{{- $effectiveSpec = set $effectiveSpec "resourceNames" $resourceNames }}
+
+# ==============================================================================
+# Build principal name lookup (name -> index)
+# ==============================================================================
+{{- $principalNames := dict }}
+{{- range $i, $prin := $effectiveSpec.principals }}
+  {{- $prinName := $prin.name | default (printf "prin-%d" $i) }}
+  {{- $_ := set $principalNames $prinName $i }}
+{{- end }}
+{{- $effectiveSpec = set $effectiveSpec "principalNames" $principalNames }}
+
+# ==============================================================================
+# Initialize $state
+# ==============================================================================
+{{- $state := dict
+  "spec" (dict
+    "raw" $spec
+    "effective" $effectiveSpec
+  )
+  "observed" (dict
+    "share" (dict)
+    "resources" (dict)
+    "principals" (dict)
+  )
+  "ramshare" (dict)
+  "status" (dict)
+}}

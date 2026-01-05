@@ -1,0 +1,29 @@
+# code: language=yaml
+#
+# Observed State: ResourceShare
+# =============================
+# Extract observed state from the ResourceShare resource.
+#
+
+{{- $raw := $.observed.resources | default dict }}
+{{- $entry := get $raw "resource-share" | default dict }}
+{{- $resource := $entry.resource | default dict }}
+{{- $status := $resource.status | default dict }}
+{{- $atProvider := $status.atProvider | default dict }}
+
+# Check readiness
+{{- $ready := false }}
+{{- range ($status.conditions | default list) }}
+  {{- if and (eq .type "Ready") (eq .status "True") }}
+    {{- $ready = true }}
+  {{- end }}
+{{- end }}
+
+# Set observed.share slice
+{{- $share := dict
+  "ready" $ready
+  "arn" ($atProvider.arn | default "")
+  "id" ($atProvider.id | default "")
+  "name" ($atProvider.name | default "")
+}}
+{{- $state = set $state "observed" (merge $state.observed (dict "share" $share)) }}

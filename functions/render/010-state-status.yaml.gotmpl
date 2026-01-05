@@ -1,0 +1,65 @@
+# code: language=yaml
+#
+# Computed Status
+# ===============
+# Compute the status output values.
+#
+
+{{- $ramshare := $state.ramshare }}
+{{- $observed := $state.observed }}
+
+# ==============================================================================
+# Check overall readiness
+# ==============================================================================
+{{- $allReady := $observed.share.ready }}
+
+# Check all resources are ready
+{{- range $res := $ramshare.resources.items }}
+  {{- if and $res.render (not $res.ready) }}
+    {{- $allReady = false }}
+  {{- end }}
+{{- end }}
+
+# Check all principals are ready
+{{- range $prin := $ramshare.principals.items }}
+  {{- if and $prin.render (not $prin.ready) }}
+    {{- $allReady = false }}
+  {{- end }}
+{{- end }}
+
+# ==============================================================================
+# Build resource status list
+# ==============================================================================
+{{- $resourceStatus := list }}
+{{- range $res := $ramshare.resources.items }}
+  {{- $resourceStatus = append $resourceStatus (dict
+    "name" $res.name
+    "arn" $res.arn
+    "ready" $res.ready
+  ) }}
+{{- end }}
+
+# ==============================================================================
+# Build principal status list
+# ==============================================================================
+{{- $principalStatus := list }}
+{{- range $prin := $ramshare.principals.items }}
+  {{- $principalStatus = append $principalStatus (dict
+    "name" $prin.name
+    "principal" $prin.principal
+    "ready" $prin.ready
+  ) }}
+{{- end }}
+
+# ==============================================================================
+# Set status
+# ==============================================================================
+{{- $status := dict
+  "ready" $allReady
+  "shareArn" ($observed.share.arn | default "Pending")
+  "shareId" ($observed.share.id | default "Pending")
+  "resources" $resourceStatus
+  "principals" $principalStatus
+}}
+
+{{- $state = set $state "status" $status }}

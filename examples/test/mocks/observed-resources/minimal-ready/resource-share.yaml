@@ -1,0 +1,21 @@
+apiVersion: ram.aws.m.upbound.io/v1beta1
+kind: ResourceShare
+metadata:
+  name: minimal-share
+  annotations:
+    crossplane.io/composition-resource-name: resource-share
+    gotemplating.fn.crossplane.io/composition-resource-name: resource-share
+status:
+  atProvider:
+    arn: arn:aws:ram:us-east-1:123456789012:resource-share/abc-123-def-456
+    id: arn:aws:ram:us-east-1:123456789012:resource-share/abc-123-def-456
+    name: minimal-share
+    allowExternalPrincipals: false
+    region: us-east-1
+    tags:
+      hops: "true"
+  conditions:
+  - type: Ready
+    status: "True"
+    reason: Available
+    lastTransitionTime: "2024-01-01T00:00:00Z"
