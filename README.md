@@ -17,6 +17,14 @@ Share AWS resources across accounts using AWS Resource Access Manager (RAM).
 - Private CA shared for consistent certificate issuance
 - Clear audit trail of what's shared with whom
 
+# Prerequisites
+
+Set up RAM sharing with: 
+
+```
+aws ram enable-sharing-with-aws-organization
+```
+
 ## The Journey
 
 ### Stage 1: Getting Started (Single Share)
