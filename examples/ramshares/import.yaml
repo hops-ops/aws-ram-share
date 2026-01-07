@@ -1,0 +1,47 @@
+# Import existing RAM resources into Crossplane management.
+# managementPolicies excludes "Delete" to prevent accidental deletion.
+#
+# Use this pattern to:
+# 1. Adopt pre-existing RAM shares into Crossplane management
+# 2. Re-run E2E tests against persistent resources without recreation
+# 3. Migrate resources between Crossplane installations
+#
+# How to get external names:
+# - ResourceShare ARN: aws ram get-resource-shares --resource-owner SELF --query 'resourceShares[*].resourceShareArn'
+# - Resource/Principal association IDs: aws ram get-resource-share-associations --association-type PRINCIPAL|RESOURCE --query 'resourceShareAssociations[*].[name,associatedEntity]'
+apiVersion: aws.hops.ops.com.ai/v1alpha1
+kind: RAMShare
+metadata:
+  name: imported-ram-share
+  namespace: crossplane-system
+spec:
+  region: us-east-1
+  name: imported-ram-share
+
+  # Exclude Delete to safely import without risk of accidental deletion
+  managementPolicies:
+    - Create
+    - Observe
+    - Update
+    - LateInitialize
+
+  # External names of existing AWS resources to import
+  imports:
+    # RAM resource share ARN
+    resourceShare: arn:aws:ram:us-east-1:123456789012:resource-share/12345678-1234-1234-1234-123456789012
+    # Map resource names to association IDs
+    resources:
+      my-ipam-pool: rsa-0abc123def456789
+    # Map principal names to association IDs
+    principals:
+      target-account: rsa-0def456abc789012
+
+  # Share the IPAM pool with target account
+  resources:
+    - name: my-ipam-pool
+      arn: arn:aws:ec2::123456789012:ipam-pool/ipam-pool-0abc123
+
+  principals:
+    - name: target-account
+      type: account
+      id: "999999999999"

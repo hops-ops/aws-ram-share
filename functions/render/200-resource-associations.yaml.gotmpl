@@ -10,6 +10,7 @@
 {{- if $rs.resources.render }}
 {{- range $res := $rs.resources.items }}
 {{- if $res.render }}
+{{- $resourceImport := get $rs.imports.resources $res.name | default "" }}
 ---
 apiVersion: ram.aws.m.upbound.io/v1beta1
 kind: ResourceAssociation
@@ -17,6 +18,9 @@ metadata:
   name: {{ $rs.xrName }}-{{ $res.name }}
   annotations:
     {{ setResourceNameAnnotation (printf "resource-assoc-%s" $res.name) }}
+    {{- if $resourceImport }}
+    crossplane.io/external-name: {{ $resourceImport }}
+    {{- end }}
   labels: {{ merge (dict "hops.ops.com.ai/resource-name" $res.name) $rs.labels | toJson }}
 spec:
   managementPolicies: {{ toJson $rs.managementPolicies }}

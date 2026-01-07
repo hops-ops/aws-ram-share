@@ -10,6 +10,7 @@
 {{- if $rs.principals.render }}
 {{- range $prin := $rs.principals.items }}
 {{- if $prin.render }}
+{{- $principalImport := get $rs.imports.principals $prin.name | default "" }}
 ---
 apiVersion: ram.aws.m.upbound.io/v1beta1
 kind: PrincipalAssociation
@@ -17,6 +18,9 @@ metadata:
   name: {{ $rs.xrName }}-{{ $prin.name }}
   annotations:
     {{ setResourceNameAnnotation (printf "principal-assoc-%s" $prin.name) }}
+    {{- if $principalImport }}
+    crossplane.io/external-name: {{ $principalImport }}
+    {{- end }}
   labels: {{ merge (dict "hops.ops.com.ai/principal-name" $prin.name "hops.ops.com.ai/principal-type" $prin.type) $rs.labels | toJson }}
 spec:
   managementPolicies: {{ toJson $rs.managementPolicies }}

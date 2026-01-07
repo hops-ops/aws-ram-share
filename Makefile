@@ -15,7 +15,8 @@ EXAMPLES := \
 	examples/ramshares/minimal.yaml::examples/test/mocks/observed-resources/minimal-ready/ \
 	examples/ramshares/ipam-pools.yaml:: \
 	examples/ramshares/transit-gateway.yaml:: \
-	examples/ramshares/private-ca.yaml::
+	examples/ramshares/private-ca.yaml:: \
+	examples/ramshares/import.yaml::
 
 clean:
 	rm -rf _output

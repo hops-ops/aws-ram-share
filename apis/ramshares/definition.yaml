@@ -40,6 +40,39 @@ spec:
                   - LateInitialize
                 default:
                 - "*"
+
+              # Import existing resources (similar to Terraform import)
+              imports:
+                type: object
+                description: |
+                  External names of existing AWS resources to import into Crossplane management.
+                  Use with managementPolicies excluding "Delete" to adopt without risk of deletion.
+                  Leave fields empty to create new resources.
+                properties:
+                  resourceShare:
+                    type: string
+                    description: |
+                      Existing RAM resource share ARN to import.
+                      Example: "arn:aws:ram:us-east-1:123456789012:resource-share/12345678-1234-1234-1234-123456789012"
+                  principals:
+                    type: object
+                    description: |
+                      Map of principal names to association IDs.
+                      The key is the principal name from the principals array.
+                      The value is the RAM principal association ID.
+                      Example: { "target-account": "rsa-0abc123def456789" }
+                    additionalProperties:
+                      type: string
+                  resources:
+                    type: object
+                    description: |
+                      Map of resource names to association IDs.
+                      The key is the resource name from the resources array.
+                      The value is the RAM resource association ID.
+                      Example: { "my-ipam-pool": "rsa-0abc123def456789" }
+                    additionalProperties:
+                      type: string
+
               providerConfigRef:
                 type: object
                 description: Reference to the ProviderConfig for AWS API operations.

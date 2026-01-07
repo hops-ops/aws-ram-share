@@ -15,6 +15,9 @@ metadata:
   name: {{ $rs.xrName }}
   annotations:
     {{ setResourceNameAnnotation "resource-share" }}
+    {{- if $rs.imports.resourceShare }}
+    crossplane.io/external-name: {{ $rs.imports.resourceShare }}
+    {{- end }}
   labels: {{ $rs.labels | toJson }}
 spec:
   managementPolicies: {{ toJson $rs.managementPolicies }}

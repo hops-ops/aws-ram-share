@@ -23,6 +23,9 @@
 # ==============================================================================
 {{- $providerConfigRef := $spec.providerConfigRef | default (dict) }}
 
+{{- /* Extract imports section for resource adoption */}}
+{{- $imports := $spec.imports | default dict }}
+
 {{- $effectiveSpec := dict
   "xrName" $metadata.name
   "region" $spec.region
@@ -39,6 +42,11 @@
   "principals" ($spec.principals | default list)
   "tags" (merge (dict "hops" "true") ($spec.tags | default dict))
   "labels" (merge $defaultLabels ($spec.labels | default dict))
+  "imports" (dict
+    "resourceShare" ($imports.resourceShare | default "")
+    "principals" ($imports.principals | default dict)
+    "resources" ($imports.resources | default dict)
+  )
 }}
 
 # ==============================================================================

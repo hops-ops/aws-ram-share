@@ -29,7 +29,8 @@ jobs:
           { "example": "examples/ramshares/minimal.yaml", "observed_resources": "examples/test/mocks/observed-resources/minimal-ready/" },
           { "example": "examples/ramshares/ipam-pools.yaml" },
           { "example": "examples/ramshares/transit-gateway.yaml" },
-          { "example": "examples/ramshares/private-ca.yaml" }
+          { "example": "examples/ramshares/private-ca.yaml" },
+          { "example": "examples/ramshares/import.yaml" }
         ]
       api_path: apis/ramshares
       error_on_missing_schemas: true
