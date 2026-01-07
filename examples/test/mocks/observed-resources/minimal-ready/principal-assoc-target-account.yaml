@@ -1,0 +1,18 @@
+apiVersion: ram.aws.m.upbound.io/v1beta1
+kind: PrincipalAssociation
+metadata:
+  name: minimal-share-target-account
+  annotations:
+    crossplane.io/composition-resource-name: principal-assoc-target-account
+    gotemplating.fn.crossplane.io/composition-resource-name: principal-assoc-target-account
+status:
+  atProvider:
+    id: arn:aws:ram:us-east-1:123456789012:resource-share/abc-123-def-456,999999999999
+    principal: "999999999999"
+    resourceShareArn: arn:aws:ram:us-east-1:123456789012:resource-share/abc-123-def-456
+    region: us-east-1
+  conditions:
+  - type: Ready
+    status: "True"
+    reason: Available
+    lastTransitionTime: "2024-01-01T00:00:00Z"

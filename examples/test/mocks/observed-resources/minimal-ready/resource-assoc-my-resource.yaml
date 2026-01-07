@@ -1,0 +1,18 @@
+apiVersion: ram.aws.m.upbound.io/v1beta1
+kind: ResourceAssociation
+metadata:
+  name: minimal-share-my-resource
+  annotations:
+    crossplane.io/composition-resource-name: resource-assoc-my-resource
+    gotemplating.fn.crossplane.io/composition-resource-name: resource-assoc-my-resource
+status:
+  atProvider:
+    id: arn:aws:ram:us-east-1:123456789012:resource-share/abc-123-def-456
+    resourceArn: arn:aws:ec2::123456789012:ipam-pool/ipam-pool-0abc123
+    resourceShareArn: arn:aws:ram:us-east-1:123456789012:resource-share/abc-123-def-456
+    region: us-east-1
+  conditions:
+  - type: Ready
+    status: "True"
+    reason: Available
+    lastTransitionTime: "2024-01-01T00:00:00Z"

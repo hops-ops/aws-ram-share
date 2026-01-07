@@ -30,6 +30,30 @@ spec:
   providerConfigRef:
     name: {{ $rs.providerConfig.name }}
     kind: {{ $rs.providerConfig.kind }}
+
+# Usage: ResourceShare protects this ResourceAssociation
+{{- if and $rs.share.ready $res.ready }}
+---
+apiVersion: protection.crossplane.io/v1beta1
+kind: Usage
+metadata:
+  name: {{ $rs.xrName }}-share-protects-resource-{{ $res.name }}
+  annotations:
+    {{ setResourceNameAnnotation (printf "usage-share-resource-%s" $res.name) }}
+  labels:
+    hops.ops.com.ai/ram-share: {{ $rs.xrName }}
+spec:
+  of:
+    apiVersion: ram.aws.m.upbound.io/v1beta1
+    kind: ResourceShare
+    resourceRef:
+      name: {{ $rs.xrName }}
+  by:
+    apiVersion: ram.aws.m.upbound.io/v1beta1
+    kind: ResourceAssociation
+    resourceRef:
+      name: {{ $rs.xrName }}-{{ $res.name }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
