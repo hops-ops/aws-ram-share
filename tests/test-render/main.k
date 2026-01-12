@@ -47,7 +47,10 @@ _items = [
                         providerConfigRef = {name = "default", kind = "ProviderConfig"}
                         forProvider = {
                             allowExternalPrincipals = False
-                            tags = {hops = "true"}
+                            tags = {
+                                "hops.ops.com.ai/managed" = "true"
+                                "hops.ops.com.ai/ramshare" = "test-defaults"
+                            }
                         }
                     }
                 }
@@ -100,7 +103,7 @@ _items = [
     # Test: Tags merge with defaults
     # =========================================================================
     # When: Custom tags provided
-    # Then: Tags merge with default "hops: true" tag
+    # Then: Tags merge with default managed/ramshare tags
     metav1alpha1.CompositionTest{
         metadata.name = "tags-merge-with-defaults"
         spec = {
@@ -129,7 +132,8 @@ _items = [
                     kind = "ResourceShare"
                     metadata.name = "test-tags"
                     spec.forProvider.tags = {
-                        hops = "true"
+                        "hops.ops.com.ai/managed" = "true"
+                        "hops.ops.com.ai/ramshare" = "test-tags"
                         Environment = "production"
                         Team = "platform"
                     }

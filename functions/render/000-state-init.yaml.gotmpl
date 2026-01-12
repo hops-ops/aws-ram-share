@@ -9,14 +9,17 @@
 {{- $xr := getCompositeResource . }}
 {{- $metadata := $xr.metadata | default (dict) }}
 {{- $spec := $xr.spec | default (dict) }}
+{{- $name := $metadata.name | default "" }}
 
 # ==============================================================================
-# Default labels: managed=true + <kind>=<name>
+# Default labels/tags: managed=true + <kind>=<name>
 # ==============================================================================
-{{- $defaultLabels := dict
+{{- $defaults := dict
   "hops.ops.com.ai/managed" "true"
-  (printf "hops.ops.com.ai/%s" (lower $xr.kind)) $metadata.name
+  (printf "hops.ops.com.ai/%s" (lower $xr.kind)) $name
 }}
+{{- $labels := merge $defaults ($spec.labels | default dict) }}
+{{- $tags := merge $defaults ($spec.tags | default dict) }}
 
 # ==============================================================================
 # Build spec.effective with defaults
@@ -24,7 +27,7 @@
 {{- $providerConfigRef := $spec.providerConfigRef | default (dict) }}
 
 {{- $effectiveSpec := dict
-  "xrName" $metadata.name
+  "xrName" $name
   "region" $spec.region
   "name" $spec.name
   "allowExternalPrincipals" ($spec.allowExternalPrincipals | default false)
@@ -37,8 +40,8 @@
   )
   "resources" ($spec.resources | default list)
   "principals" ($spec.principals | default list)
-  "tags" (merge (dict "hops" "true") ($spec.tags | default dict))
-  "labels" (merge $defaultLabels ($spec.labels | default dict))
+  "tags" $tags
+  "labels" $labels
 }}
 
 # ==============================================================================
