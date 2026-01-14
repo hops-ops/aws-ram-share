@@ -29,17 +29,18 @@ spec:
     name: {{ $rs.providerConfig.name }}
     kind: {{ $rs.providerConfig.kind }}
 
-# Usage: ResourceShare protects this PrincipalAssociation
+# Usage: Delete PrincipalAssociation before ResourceShare
 {{- if and $rs.share.ready $prin.ready }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $rs.xrName }}-share-protects-principal-{{ $prin.name }}
+  name: {{ $rs.xrName }}-delete-principal-{{ $prin.name }}-before-share
   annotations:
-    {{ setResourceNameAnnotation (printf "usage-share-principal-%s" $prin.name) }}
+    {{ setResourceNameAnnotation (printf "delete-principal-%s-before-share" $prin.name) }}
   labels: {{ $rs.labels | toJson }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: ram.aws.m.upbound.io/v1beta1
     kind: ResourceShare

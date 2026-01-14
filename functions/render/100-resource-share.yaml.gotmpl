@@ -25,7 +25,7 @@ spec:
     {{- if gt (len $rs.permissionArns) 0 }}
     permissionArns: {{ toJson $rs.permissionArns }}
     {{- end }}
-    tags: {{ toJson $rs.tags }}
+    tags: {{ merge (dict "Name" $rs.xrName) $rs.tags | toJson }}
     {{- range $k, $v := $rs.forProvider }}
     {{ $k }}: {{ toJson $v }}
     {{- end }}
