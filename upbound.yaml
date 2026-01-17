@@ -11,7 +11,7 @@ spec:
   - apiVersion: pkg.crossplane.io/v1
     kind: Provider
     package: xpkg.crossplane.io/crossplane-contrib/provider-aws-ram
-    version: '>=v2.1.0'
+    version: '>=v2.3.0'
   description: XRD for AWS Resource Access Manager (RAM) shares enabling cross-account
     resource sharing.
   license: Apache-2.0
