@@ -45,6 +45,7 @@ jobs:
       aws-account-id: "034489662075"
       aws-region: us-east-2
       timeout-minutes: 33
+      write-env-files: true
       env-vars: |
         {
           "DESTINATION_ACCOUNT_ID": "${{ vars.DESTINATION_ACCOUNT_ID }}",
