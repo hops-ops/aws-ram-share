@@ -23,20 +23,20 @@ _base64_creds = base64.encode(_creds)
 # =============================================================================
 
 _share_name = "hops-e2e-ramshare"
-_region = "us-east-2"
+_region = file.read("env/AWS_REGION").strip()
 
 # Existing test account (from aws-organization e2e test)
-_source_account_id = "034489662075"
-_destination_account_id = "544051101726"
+_source_account_id = file.read("env/AWS_ACCOUNT_ID").strip()
+_destination_account_id = file.read("env/DESTINATION_ACCOUNT_ID").strip()
 
 # Existing IPAM pool ARNs (from aws-ipam e2e test)
 # Get pool ARN: aws ec2 describe-ipam-pools --query 'IpamPools[*].[IpamPoolId,IpamPoolArn]'
-_ipv4_regional_pool_id = "ipam-pool-0607416fa3707147a"
-_ipv4_regional_pool_arn = "arn:aws:ec2::" + _source_account_id + ":ipam-pool/" + _ipv4_regional_pool_id
+_ipv4_regional_pool_id = file.read("env/IPAM_POOL_REGIONAL_IPV4").strip()
+_ipv4_regional_pool_arn = file.read("env/IPAM_POOL_REGIONAL_IPV4_ARN").strip()
 
 
 # Existing test OU (from aws-organization e2e test)
-_test_ou_arn = "arn:aws:organizations::" + _source_account_id + ":ou/o-3lholziq1o/ou-hdvp-fbcb7sbw"
+_test_ou_arn = file.read("env/TEST_OU_ARN").strip()
 
 # =============================================================================
 # E2E Test Definition
