@@ -4,3 +4,4 @@ _output/
 
 # E2E test credentials
 tests/e2etest-*/secrets/
+tests/**/env/
